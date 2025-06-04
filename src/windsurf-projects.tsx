@@ -1,4 +1,13 @@
-import { Action, ActionPanel, List, showToast, Toast, Icon, Color, Clipboard } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  List,
+  showToast,
+  Toast,
+  Icon,
+  Color,
+  Clipboard,
+} from "@raycast/api";
 import { useState, useEffect } from "react";
 import { loadWindsurfProjects, removeWindsurfProject } from "./utils/storage";
 import { openInWindsurf, formatRelativeTime } from "./utils/windsurf";
@@ -19,7 +28,7 @@ export default function WindsurfProjects() {
     try {
       const loadedProjects = await loadWindsurfProjects();
       // Filter out projects that no longer exist
-      const existingProjects = loadedProjects.filter(project => {
+      const existingProjects = loadedProjects.filter((project) => {
         try {
           return fs.existsSync(project.path);
         } catch {
@@ -32,7 +41,7 @@ export default function WindsurfProjects() {
       await showToast({
         style: Toast.Style.Failure,
         title: "Failed to load projects",
-        message: "Could not load Windsurf projects"
+        message: "Could not load Windsurf projects",
       });
     } finally {
       setIsLoading(false);
@@ -48,38 +57,38 @@ export default function WindsurfProjects() {
   async function handleRemoveProject(project: WindsurfProject) {
     try {
       await removeWindsurfProject(project.path);
-      setProjects(prev => prev.filter(p => p.path !== project.path));
+      setProjects((prev) => prev.filter((p) => p.path !== project.path));
       await showToast({
         style: Toast.Style.Success,
         title: "Project removed",
-        message: `Removed ${project.name} from recent projects`
+        message: `Removed ${project.name} from recent projects`,
       });
     } catch (error) {
       console.error("Error removing project:", error);
       await showToast({
         style: Toast.Style.Failure,
         title: "Failed to remove project",
-        message: "Could not remove project from list"
+        message: "Could not remove project from list",
       });
     }
   }
 
   function getProjectIcon(project: WindsurfProject) {
-    if (project.type === 'folder') {
+    if (project.type === "folder") {
       return { source: Icon.Folder, tintColor: Color.Blue };
     } else {
       const ext = path.extname(project.path).toLowerCase();
       switch (ext) {
-        case '.js':
-        case '.jsx':
-        case '.ts':
-        case '.tsx':
+        case ".js":
+        case ".jsx":
+        case ".ts":
+        case ".tsx":
           return { source: Icon.Code, tintColor: Color.Yellow };
-        case '.py':
+        case ".py":
           return { source: Icon.Code, tintColor: Color.Green };
-        case '.json':
+        case ".json":
           return { source: Icon.Document, tintColor: Color.Orange };
-        case '.md':
+        case ".md":
           return { source: Icon.Document, tintColor: Color.Purple };
         default:
           return { source: Icon.Document, tintColor: Color.SecondaryText };
@@ -88,7 +97,10 @@ export default function WindsurfProjects() {
   }
 
   return (
-    <List isLoading={isLoading} searchBarPlaceholder="Search Windsurf projects...">
+    <List
+      isLoading={isLoading}
+      searchBarPlaceholder="Search Windsurf projects..."
+    >
       {projects.length === 0 ? (
         <List.EmptyView
           title="No Windsurf Projects"
@@ -103,7 +115,7 @@ export default function WindsurfProjects() {
             subtitle={project.path}
             accessories={[
               { text: formatRelativeTime(project.lastOpened) },
-              { text: project.type === 'folder' ? 'Folder' : 'File' }
+              { text: project.type === "folder" ? "Folder" : "File" },
             ]}
             icon={getProjectIcon(project)}
             actions={
@@ -116,8 +128,11 @@ export default function WindsurfProjects() {
                 <Action
                   title="Show in Finder"
                   onAction={() => {
-                    const dirPath = project.type === 'folder' ? project.path : path.dirname(project.path);
-                    require('child_process').exec(`open "${dirPath}"`);
+                    const dirPath =
+                      project.type === "folder"
+                        ? project.path
+                        : path.dirname(project.path);
+                    require("child_process").exec(`open "${dirPath}"`);
                   }}
                   icon={Icon.Finder}
                   shortcut={{ modifiers: ["cmd"], key: "f" }}
@@ -129,7 +144,7 @@ export default function WindsurfProjects() {
                     await showToast({
                       style: Toast.Style.Success,
                       title: "Path copied",
-                      message: "Project path copied to clipboard"
+                      message: "Project path copied to clipboard",
                     });
                   }}
                   icon={Icon.Clipboard}

@@ -10,7 +10,7 @@ export async function loadWindsurfProjects(): Promise<WindsurfProject[]> {
       const projects = JSON.parse(stored);
       return projects.map((project: any) => ({
         ...project,
-        lastOpened: new Date(project.lastOpened)
+        lastOpened: new Date(project.lastOpened),
       }));
     }
   } catch (error) {
@@ -19,19 +19,21 @@ export async function loadWindsurfProjects(): Promise<WindsurfProject[]> {
   return [];
 }
 
-export async function saveWindsurfProject(project: WindsurfProject): Promise<void> {
+export async function saveWindsurfProject(
+  project: WindsurfProject
+): Promise<void> {
   try {
     const projects = await loadWindsurfProjects();
-    
+
     // Remove existing project with same path
-    const filteredProjects = projects.filter(p => p.path !== project.path);
-    
+    const filteredProjects = projects.filter((p) => p.path !== project.path);
+
     // Add new project at the beginning
     const updatedProjects = [project, ...filteredProjects];
-    
+
     // Keep only the last 50 projects
     const limitedProjects = updatedProjects.slice(0, 50);
-    
+
     await LocalStorage.setItem(STORAGE_KEY, JSON.stringify(limitedProjects));
   } catch (error) {
     console.error("Error saving Windsurf project:", error);
@@ -41,7 +43,7 @@ export async function saveWindsurfProject(project: WindsurfProject): Promise<voi
 export async function removeWindsurfProject(path: string): Promise<void> {
   try {
     const projects = await loadWindsurfProjects();
-    const filteredProjects = projects.filter(p => p.path !== path);
+    const filteredProjects = projects.filter((p) => p.path !== path);
     await LocalStorage.setItem(STORAGE_KEY, JSON.stringify(filteredProjects));
   } catch (error) {
     console.error("Error removing Windsurf project:", error);

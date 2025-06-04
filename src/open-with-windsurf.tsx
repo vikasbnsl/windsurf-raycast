@@ -1,4 +1,9 @@
-import { showToast, Toast, getSelectedFinderItems, showHUD } from "@raycast/api";
+import {
+  showToast,
+  Toast,
+  getSelectedFinderItems,
+  showHUD,
+} from "@raycast/api";
 import { openInWindsurf, checkWindsurfInstalled } from "./utils/windsurf";
 import path from "path";
 
@@ -10,7 +15,7 @@ export default async function OpenWithWindsurf() {
       await showToast({
         style: Toast.Style.Failure,
         title: "Windsurf not found",
-        message: "Please install Windsurf IDE to use this extension"
+        message: "Please install Windsurf IDE to use this extension",
       });
       return;
     }
@@ -23,7 +28,7 @@ export default async function OpenWithWindsurf() {
       await showToast({
         style: Toast.Style.Failure,
         title: "No file selected",
-        message: "Please select a file or folder in Finder first"
+        message: "Please select a file or folder in Finder first",
       });
       return;
     }
@@ -32,7 +37,7 @@ export default async function OpenWithWindsurf() {
       await showToast({
         style: Toast.Style.Failure,
         title: "No file selected",
-        message: "Please select a file or folder in Finder first"
+        message: "Please select a file or folder in Finder first",
       });
       return;
     }
@@ -40,16 +45,15 @@ export default async function OpenWithWindsurf() {
     // Open the first selected item in Windsurf
     const targetPath = selectedItems[0].path;
     await openInWindsurf(targetPath);
-    
+
     // Show success HUD
     await showHUD(`Opened ${path.basename(targetPath)} in Windsurf`);
-    
   } catch (error) {
     console.error("Error in OpenWithWindsurf:", error);
     await showToast({
       style: Toast.Style.Failure,
       title: "Failed to open in Windsurf",
-      message: error instanceof Error ? error.message : "Unknown error"
+      message: error instanceof Error ? error.message : "Unknown error",
     });
   }
 }
