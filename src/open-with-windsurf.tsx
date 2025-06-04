@@ -1,9 +1,4 @@
-import {
-  showToast,
-  Toast,
-  getSelectedFinderItems,
-  showHUD,
-} from "@raycast/api";
+import { showToast, Toast, getSelectedFinderItems, showHUD } from "@raycast/api";
 import { openInWindsurf, checkWindsurfInstalled } from "./utils/windsurf";
 import path from "path";
 
@@ -24,7 +19,7 @@ export default async function OpenWithWindsurf() {
     let selectedItems;
     try {
       selectedItems = await getSelectedFinderItems();
-    } catch (error) {
+    } catch {
       await showToast({
         style: Toast.Style.Failure,
         title: "No file selected",
@@ -48,12 +43,12 @@ export default async function OpenWithWindsurf() {
 
     // Show success HUD
     await showHUD(`Opened ${path.basename(targetPath)} in Windsurf`);
-  } catch (error) {
-    console.error("Error in OpenWithWindsurf:", error);
+  } catch (_error) {
+    console.error("Error in OpenWithWindsurf:", _error);
     await showToast({
       style: Toast.Style.Failure,
       title: "Failed to open in Windsurf",
-      message: error instanceof Error ? error.message : "Unknown error",
+      message: _error instanceof Error ? _error.message : "Unknown error",
     });
   }
 }

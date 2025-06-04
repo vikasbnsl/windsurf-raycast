@@ -1,19 +1,11 @@
-import {
-  Action,
-  ActionPanel,
-  List,
-  showToast,
-  Toast,
-  Icon,
-  Color,
-  Clipboard,
-} from "@raycast/api";
+import { Action, ActionPanel, List, showToast, Toast, Icon, Color, Clipboard } from "@raycast/api";
 import { useState, useEffect } from "react";
 import { loadWindsurfProjects, removeWindsurfProject } from "./utils/storage";
 import { openInWindsurf, formatRelativeTime } from "./utils/windsurf";
 import { WindsurfProject } from "./utils/types";
 import path from "path";
 import fs from "fs";
+import { exec } from "child_process";
 
 export default function WindsurfProjects() {
   const [projects, setProjects] = useState<WindsurfProject[]>([]);
@@ -97,10 +89,7 @@ export default function WindsurfProjects() {
   }
 
   return (
-    <List
-      isLoading={isLoading}
-      searchBarPlaceholder="Search Windsurf projects..."
-    >
+    <List isLoading={isLoading} searchBarPlaceholder="Search Windsurf projects...">
       {projects.length === 0 ? (
         <List.EmptyView
           title="No Windsurf Projects"
@@ -120,19 +109,12 @@ export default function WindsurfProjects() {
             icon={getProjectIcon(project)}
             actions={
               <ActionPanel>
-                <Action
-                  title="Open in Windsurf"
-                  onAction={() => handleOpenProject(project)}
-                  icon={Icon.ArrowRight}
-                />
+                <Action title="Open in Windsurf" onAction={() => handleOpenProject(project)} icon={Icon.ArrowRight} />
                 <Action
                   title="Show in Finder"
                   onAction={() => {
-                    const dirPath =
-                      project.type === "folder"
-                        ? project.path
-                        : path.dirname(project.path);
-                    require("child_process").exec(`open "${dirPath}"`);
+                    const dirPath = project.type === "folder" ? project.path : path.dirname(project.path);
+                    exec(`open "${dirPath}"`);
                   }}
                   icon={Icon.Finder}
                   shortcut={{ modifiers: ["cmd"], key: "f" }}

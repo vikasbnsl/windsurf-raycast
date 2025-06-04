@@ -8,7 +8,7 @@ export async function loadWindsurfProjects(): Promise<WindsurfProject[]> {
     const stored = await LocalStorage.getItem<string>(STORAGE_KEY);
     if (stored) {
       const projects = JSON.parse(stored);
-      return projects.map((project: any) => ({
+      return projects.map((project: Omit<WindsurfProject, "lastOpened"> & { lastOpened: string }) => ({
         ...project,
         lastOpened: new Date(project.lastOpened),
       }));
@@ -19,9 +19,7 @@ export async function loadWindsurfProjects(): Promise<WindsurfProject[]> {
   return [];
 }
 
-export async function saveWindsurfProject(
-  project: WindsurfProject
-): Promise<void> {
+export async function saveWindsurfProject(project: WindsurfProject): Promise<void> {
   try {
     const projects = await loadWindsurfProjects();
 
