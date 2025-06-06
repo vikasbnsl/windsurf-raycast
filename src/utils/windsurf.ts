@@ -27,15 +27,17 @@ export async function openInWindsurf(filePath: string): Promise<void> {
     // Open in Windsurf
     await execAsync(`open -a "Windsurf" "${filePath}"`);
 
-    // Save to recent projects
-    const project: WindsurfProject = {
-      name: path.basename(filePath),
-      path: filePath,
-      lastOpened: new Date(),
-      type: isDirectory ? "folder" : "file",
-    };
+    // Only save folders to recent projects (not files)
+    if (isDirectory) {
+      const project: WindsurfProject = {
+        name: path.basename(filePath),
+        path: filePath,
+        lastOpened: new Date(),
+        type: "folder",
+      };
 
-    await saveWindsurfProject(project);
+      await saveWindsurfProject(project);
+    }
 
     await showToast({
       style: Toast.Style.Success,

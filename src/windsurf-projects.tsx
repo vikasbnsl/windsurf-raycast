@@ -1,6 +1,6 @@
-import { Action, ActionPanel, List, showToast, Toast, Icon, Color, Clipboard } from "@raycast/api";
+import { Action, ActionPanel, List, showToast, Toast, Icon, Color, Clipboard, getSelectedFinderItems } from "@raycast/api";
 import { useState, useEffect } from "react";
-import { loadWindsurfProjects, removeWindsurfProject } from "./utils/storage";
+import { loadWindsurfProjects, removeWindsurfProject, saveWindsurfProject } from "./utils/storage";
 import { openInWindsurf, formatRelativeTime } from "./utils/windsurf";
 import { WindsurfProject } from "./utils/types";
 import path from "path";
@@ -65,6 +65,113 @@ export default function WindsurfProjects() {
     }
   }
 
+  async function handleAddProject() {
+    try {
+      // Try to get selected items from Finder first
+      let selectedPaths: string[] = [];
+      
+      try {
+        const finderItems = await getSelectedFinderItems();
+        selectedPaths = finderItems.map(item => item.path);
+      } catch {
+        // If no Finder selection, fall back to AppleScript folder selector
+        const script = `
+          set selectedItem to choose folder with prompt "Select a folder to add to Windsurf projects:"
+          return POSIX path of selectedItem
+        `;
+        
+        return new Promise<void>((resolve) => {
+          exec(`osascript -e '${script}'`, async (error, stdout) => {
+            if (error) {
+              if (error.message.includes("User canceled") || error.message.includes("execution error")) {
+                resolve();
+                return;
+              }
+              console.error("Error selecting folder:", error);
+              await showToast({
+                style: Toast.Style.Failure,
+                title: "Failed to select folder",
+                message: "Could not open folder selector",
+              });
+              resolve();
+              return;
+            }
+
+            const selectedPath = stdout.trim();
+            if (!selectedPath) {
+              resolve();
+              return;
+            }
+
+            await addProjectFromPath(selectedPath);
+            resolve();
+          });
+        });
+      }
+
+      // Process selected Finder items
+      if (selectedPaths.length === 0) {
+        await showToast({
+          style: Toast.Style.Failure,
+          title: "No selection",
+          message: "Please select a folder in Finder or use the folder picker",
+        });
+        return;
+      }
+
+      // Add the first selected item (or could loop through all)
+      await addProjectFromPath(selectedPaths[0]);
+      
+    } catch (error) {
+      console.error("Error in handleAddProject:", error);
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Failed to add project",
+        message: "Could not add project",
+      });
+    }
+  }
+
+  async function addProjectFromPath(selectedPath: string) {
+    try {
+      const stats = fs.statSync(selectedPath);
+      const isDirectory = stats.isDirectory();
+      
+      // Only allow folders to be added as projects
+      if (!isDirectory) {
+        await showToast({
+          style: Toast.Style.Failure,
+          title: "Invalid selection",
+          message: "Only folders can be added as projects",
+        });
+        return;
+      }
+      
+      const project: WindsurfProject = {
+        name: path.basename(selectedPath),
+        path: selectedPath,
+        type: "folder",
+        lastOpened: new Date(),
+      };
+
+      await saveWindsurfProject(project);
+      await loadProjects(); // Refresh the list
+      
+      await showToast({
+        style: Toast.Style.Success,
+        title: "Project added",
+        message: `Added ${project.name} to recent projects`,
+      });
+    } catch (fileError) {
+      console.error("Error adding project:", fileError);
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Failed to add project",
+        message: "Could not add selected folder to projects",
+      });
+    }
+  }
+
   function getProjectIcon(project: WindsurfProject) {
     if (project.type === "folder") {
       return { source: Icon.Folder, tintColor: Color.Blue };
@@ -93,8 +200,18 @@ export default function WindsurfProjects() {
       {projects.length === 0 ? (
         <List.EmptyView
           title="No Windsurf Projects"
-          description="Use 'Open with Windsurf' command to add projects to this list"
+          description="Use 'Open with Windsurf' command or add projects manually"
           icon={Icon.Folder}
+          actions={
+            <ActionPanel>
+              <Action
+                title="Add Project"
+                onAction={handleAddProject}
+                icon={Icon.Plus}
+                shortcut={{ modifiers: ["cmd"], key: "n" }}
+              />
+            </ActionPanel>
+          }
         />
       ) : (
         projects.map((project) => (
@@ -110,6 +227,12 @@ export default function WindsurfProjects() {
             actions={
               <ActionPanel>
                 <Action title="Open in Windsurf" onAction={() => handleOpenProject(project)} icon={Icon.ArrowRight} />
+                <Action
+                  title="Add Project"
+                  onAction={handleAddProject}
+                  icon={Icon.Plus}
+                  shortcut={{ modifiers: ["cmd"], key: "n" }}
+                />
                 <Action
                   title="Show in Finder"
                   onAction={() => {
@@ -137,7 +260,7 @@ export default function WindsurfProjects() {
                   onAction={() => handleRemoveProject(project)}
                   icon={Icon.Trash}
                   style={Action.Style.Destructive}
-                  shortcut={{ modifiers: ["cmd"], key: "delete" }}
+                  shortcut={{ modifiers: ["cmd"], key: "r" }}
                 />
               </ActionPanel>
             }

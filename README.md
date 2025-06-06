@@ -10,11 +10,13 @@ A Raycast extension that provides quick access to Windsurf IDE functionality.
 - Automatically saves opened items to recent projects
 
 ### 📁 Windsurf Projects
-- View all files and folders previously opened with Windsurf
+- View all folders previously opened with Windsurf
 - Quick access to recent projects with timestamps
+- **Add Project** - Manually add folders to your projects list
 - Remove projects from the list
 - Show in Finder or copy path to clipboard
 - Smart icons based on file types
+- **Note**: Only folders can be added as projects (files are not supported)
 
 ## Commands
 
@@ -46,9 +48,17 @@ A Raycast extension that provides quick access to Windsurf IDE functionality.
 2. Browse your recent projects
 3. Press Enter to open a project in Windsurf
 4. Use keyboard shortcuts for additional actions:
+   - `Cmd+N` - Add Project (manually select a folder)
    - `Cmd+F` - Show in Finder
    - `Cmd+C` - Copy path to clipboard
-   - `Cmd+Delete` - Remove from list
+   - `Cmd+R` - Remove from list
+
+### Adding Projects Manually
+1. In the "Windsurf Projects" command, press `Cmd+N` or use the action panel
+2. The extension will first try to use any folder selected in Finder
+3. If no Finder selection, it will open a folder picker dialog
+4. Select a folder to add it to your projects list
+5. **Note**: Only folders can be added as projects
 
 ## Development
 
