@@ -41,9 +41,11 @@ export default function WindsurfProjects() {
   }
 
   async function handleOpenProject(project: WindsurfProject) {
-    await openInWindsurf(project.path);
-    // Refresh the list to update the "last opened" time
-    await loadProjects();
+    const opened = await openInWindsurf(project.path);
+    // Refresh the list to update the "last opened" time only if opened successfully
+    if (opened) {
+      await loadProjects();
+    }
   }
 
   async function handleRemoveProject(project: WindsurfProject) {

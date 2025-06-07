@@ -8,7 +8,7 @@ import fs from "fs";
 
 const execAsync = promisify(exec);
 
-export async function openInWindsurf(filePath: string): Promise<void> {
+export async function openInWindsurf(filePath: string): Promise<boolean> {
   try {
     // Check if path exists
     if (!fs.existsSync(filePath)) {
@@ -17,7 +17,7 @@ export async function openInWindsurf(filePath: string): Promise<void> {
         title: "Path not found",
         message: `The path "${filePath}" does not exist`,
       });
-      return;
+      return false;
     }
 
     // Determine if it's a file or folder
@@ -39,11 +39,7 @@ export async function openInWindsurf(filePath: string): Promise<void> {
       await saveWindsurfProject(project);
     }
 
-    await showToast({
-      style: Toast.Style.Success,
-      title: "Opened in Windsurf",
-      message: `${isDirectory ? "Folder" : "File"}: ${path.basename(filePath)}`,
-    });
+    return true;
   } catch (error) {
     console.error("Error opening in Windsurf:", error);
     await showToast({
@@ -51,6 +47,7 @@ export async function openInWindsurf(filePath: string): Promise<void> {
       title: "Failed to open in Windsurf",
       message: error instanceof Error ? error.message : "Unknown error",
     });
+    return false;
   }
 }
 

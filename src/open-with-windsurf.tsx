@@ -39,10 +39,12 @@ export default async function OpenWithWindsurf() {
 
     // Open the first selected item in Windsurf
     const targetPath = selectedItems[0].path;
-    await openInWindsurf(targetPath);
+    const opened = await openInWindsurf(targetPath);
 
-    // Show success HUD
-    await showHUD(`Opened ${path.basename(targetPath)} in Windsurf`);
+    // Show success HUD only when the item was opened successfully
+    if (opened) {
+      await showHUD(`Opened ${path.basename(targetPath)} in Windsurf`);
+    }
   } catch (_error) {
     console.error("Error in OpenWithWindsurf:", _error);
     await showToast({
