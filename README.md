@@ -7,7 +7,7 @@ A Raycast extension that provides quick access to Windsurf IDE functionality.
 ### 🚀 Open with Windsurf
 - Quickly open any file or folder in Windsurf IDE
 - Supports path expansion (use `~` for home directory)
-- Automatically saves opened items to recent projects
+- Automatically saves opened folders to recent projects
 
 ### 📁 Windsurf Projects
 - View all folders previously opened with Windsurf
@@ -41,7 +41,7 @@ A Raycast extension that provides quick access to Windsurf IDE functionality.
 1. Use the "Open with Windsurf" command
 2. Enter the path to your file or folder
 3. Press Enter to open in Windsurf
-4. The item will be automatically added to your recent projects
+4. Opened folders will be automatically added to your recent projects
 
 ### Managing Projects
 1. Use the "Windsurf Projects" command
