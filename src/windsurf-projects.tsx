@@ -1,4 +1,14 @@
-import { Action, ActionPanel, List, showToast, Toast, Icon, Color, Clipboard, getSelectedFinderItems } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  List,
+  showToast,
+  Toast,
+  Icon,
+  Color,
+  Clipboard,
+  getSelectedFinderItems,
+} from "@raycast/api";
 import { useState, useEffect } from "react";
 import { loadWindsurfProjects, removeWindsurfProject, saveWindsurfProject } from "./utils/storage";
 import { openInWindsurf, formatRelativeTime } from "./utils/windsurf";
@@ -71,17 +81,17 @@ export default function WindsurfProjects() {
     try {
       // Try to get selected items from Finder first
       let selectedPaths: string[] = [];
-      
+
       try {
         const finderItems = await getSelectedFinderItems();
-        selectedPaths = finderItems.map(item => item.path);
+        selectedPaths = finderItems.map((item) => item.path);
       } catch {
         // If no Finder selection, fall back to AppleScript folder selector
         const script = `
           set selectedItem to choose folder with prompt "Select a folder to add to Windsurf projects:"
           return POSIX path of selectedItem
         `;
-        
+
         return new Promise<void>((resolve) => {
           exec(`osascript -e '${script}'`, async (error, stdout) => {
             if (error) {
@@ -123,7 +133,6 @@ export default function WindsurfProjects() {
 
       // Add the first selected item (or could loop through all)
       await addProjectFromPath(selectedPaths[0]);
-      
     } catch (error) {
       console.error("Error in handleAddProject:", error);
       await showToast({
@@ -138,7 +147,7 @@ export default function WindsurfProjects() {
     try {
       const stats = fs.statSync(selectedPath);
       const isDirectory = stats.isDirectory();
-      
+
       // Only allow folders to be added as projects
       if (!isDirectory) {
         await showToast({
@@ -148,7 +157,7 @@ export default function WindsurfProjects() {
         });
         return;
       }
-      
+
       const project: WindsurfProject = {
         name: path.basename(selectedPath),
         path: selectedPath,
@@ -158,7 +167,7 @@ export default function WindsurfProjects() {
 
       await saveWindsurfProject(project);
       await loadProjects(); // Refresh the list
-      
+
       await showToast({
         style: Toast.Style.Success,
         title: "Project added",
