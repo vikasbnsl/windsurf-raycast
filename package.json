@@ -1,6 +1,6 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "windsurf-raycast",
+  "name": "windsurf",
   "title": "Windsurf Extension",
   "description": "Quick Raycast actions for Windsurf: open files/folders in Windsurf and manage Windsurf projects.",
   "icon": "./extension-icon.png",
